@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tennis Scores Dashboard</title>
+    <!--
+        This page uses NO server-side template tags.
+        It fetches JSON from /api/scores and renders everything client-side.
+        You can drop this into Django, Flask, FastAPI, or Express.
+    -->
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <header>
+        <div class="header-inner">
+            <h1>Tennis Scores Dashboard</h1>
+            <p class="subtitle">
+                Live data from
+                <a href="https://www.tennis.com/scores/" target="_blank">tennis.com/scores</a>
+                &mdash; grouped, sorted &amp; rated
+            </p>
+        </div>
+    </header>
+
+    <!-- SUMMARY STATS BAR -->
+    <section id="summary-bar" class="summary-bar">
+        <div class="stat" id="stat-total"><span class="stat-num">-</span><span class="stat-label">Matches</span></div>
+        <div class="stat" id="stat-live"><span class="stat-num">-</span><span class="stat-detail"></span><span class="stat-label">Status</span></div>
+        <div class="stat" id="stat-countries"><span class="stat-num">-</span><span class="stat-label">Countries</span></div>
+        <div class="stat" id="stat-threesetters"><span class="stat-num">-</span><span class="stat-label">3+ setters</span></div>
+        <div class="stat" id="stat-hottest"><span class="stat-num">-</span><span class="stat-label">Hottest</span></div>
+    </section>
+
+    <!-- CONTROLS -->
+    <section class="controls">
+        <div class="control-group">
+            <label for="group-by">Group by:</label>
+            <select id="group-by">
+                <option value="country">Country</option>
+                <option value="tournament">Tournament</option>
+                <option value="status">Status</option>
+                <option value="intensity">Match Intensity</option>
+                <option value="event">Event Type</option>
+                <option value="none">No grouping</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="filter-status">Status:</label>
+            <select id="filter-status">
+                <option value="all">All</option>
+                <option value="LIVE">Live only</option>
+                <option value="RESULT">Results only</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="sort-by">Sort by:</label>
+            <select id="sort-by">
+                <option value="intensity-desc">Intensity (hottest first)</option>
+                <option value="status">Status (live first)</option>
+                <option value="seed">Seed (top seeds first)</option>
+                <option value="player">Player A-Z</option>
+                <option value="tournament">Tournament</option>
+            </select>
+        </div>
+
+        <button id="refresh-btn" onclick="fetchScores()">Refresh</button>
+    </section>
+
+    <!-- STATUS -->
+    <div id="status-bar" class="status-bar">Loading scores...</div>
+
+    <!-- MAIN CONTENT -->
+    <main id="scores-container"></main>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>
+            Demo app &mdash; data from <a href="https://www.tennis.com/scores/">tennis.com</a>.
+            View the <a href="/api/scores" target="_blank">raw JSON API</a>.
+        </p>
+    </footer>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

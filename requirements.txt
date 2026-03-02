@@ -1,0 +1,11 @@
+# Web framework (Django-lite — same request/response pattern)
+flask==3.1.*
+
+# HTTP client for scraping
+requests==2.32.*
+
+# HTML parser for extracting scores
+beautifulsoup4==4.13.*
+
+# Production WSGI server (optional — for deployment)
+gunicorn==23.*
