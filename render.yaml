@@ -22,7 +22,7 @@ services:
     # Render injects $PORT automatically; Gunicorn binds to it above
     envVars:
       - key: PYTHON_VERSION
-        value: "3.11"                    # Render default is 3.7; pin to 3.11
+        value: "3.11.6"                    # Render default is 3.7; pin to 3.11
 
     # Free tier settings
     plan: free                           # $0 — sleeps after 15 min inactivity
