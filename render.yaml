@@ -1,0 +1,29 @@
+# ──────────────────────────────────────────────
+#  Render Blueprint  (render.yaml)
+# ──────────────────────────────────────────────
+# This file lets Render auto-configure the service when you
+# click "New → Blueprint" and connect the GitHub repo.
+#
+# Docs: https://docs.render.com/blueprint-spec
+# ──────────────────────────────────────────────
+
+services:
+  - type: web
+    name: tennis-scores
+    runtime: python
+    region: oregon                       # closest free-tier region
+
+    # Build step — install Python dependencies
+    buildCommand: pip install -r requirements.txt
+
+    # Start step — Gunicorn serves the Flask app
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+
+    # Render injects $PORT automatically; Gunicorn binds to it above
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"                    # Render default is 3.7; pin to 3.11
+
+    # Free tier settings
+    plan: free                           # $0 — sleeps after 15 min inactivity
+    autoDeploy: true                     # auto-deploy on every push to main

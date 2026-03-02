@@ -58,6 +58,9 @@ tennis-scores/
 │   └── app.js          <- Client-side fetch, group, sort, filter, render
 ├── requirements.txt    <- Python dependencies  (flask, requests, beautifulsoup4, gunicorn)
 ├── Procfile            <- For Render / Railway / Heroku deploys
+├── render.yaml         <- Render Blueprint — auto-configures the service on import
+├── vercel.json         <- Vercel config (works but no in-memory cache)
+├── .gitignore          <- Excludes venv/, __pycache__/, .env, IDE files, etc.
 └── README.md           <- You are here
 ```
 
@@ -351,14 +354,42 @@ heavy.
 
 ---
 
-## Deploying
+## Deploying to Render (free tier)
 
-### Render / Railway (one-click)
+This repo includes a `render.yaml` Blueprint spec — Render reads it to
+auto-configure the service with zero manual settings.
 
-Push to GitHub, connect the repo, and the platform auto-detects the
-`Procfile`.
+### One-click deploy
 
-### Manual (any Linux server)
+1. Push this repo to GitHub (already done).
+2. Go to [dashboard.render.com](https://dashboard.render.com/).
+3. Click **New → Blueprint**.
+4. Connect the **tennis-scores** repo.
+5. Render detects `render.yaml`, shows the config — click **Apply**.
+6. Wait ~60 seconds for the build. Your app is live at
+   `https://tennis-scores-XXXX.onrender.com`.
+
+### What the Blueprint configures
+
+| Setting | Value | Why |
+|---------|-------|-----|
+| Runtime | Python 3.11 | Pinned via `PYTHON_VERSION` env var |
+| Build command | `pip install -r requirements.txt` | Installs Flask, requests, bs4, gunicorn |
+| Start command | `gunicorn app:app --bind 0.0.0.0:$PORT` | Render injects `$PORT` automatically |
+| Plan | Free | $0 — sleeps after 15 min of inactivity |
+| Auto-deploy | Yes | Every push to `main` triggers a redeploy |
+
+### Free-tier notes
+
+- The service **sleeps after 15 minutes of no traffic**. First request
+  after sleep takes ~30 seconds to cold-start.
+- The in-memory match cache (`_match_cache`) **survives between
+  requests** as long as the service stays awake — unlike Vercel where
+  each request is a separate function invocation.
+- If you need the cache to persist across cold starts, swap it for a
+  free Redis add-on (Render offers one) or Upstash.
+
+### Manual deploy (any Linux server)
 
 ```bash
 pip install -r requirements.txt
