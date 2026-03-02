@@ -97,20 +97,27 @@ async function fetchScores() {
 
 // ── SUMMARY STATS ─────────────────────────────────────────────────
 // Populate the five stat cards at the top of the page.
+// All cards respect the current status-filter dropdown so the user
+// sees counts for "All", "LIVE", or "RESULT" — not always the full set.
 function updateSummary() {
-    const total = allMatches.length;
-    const live = allMatches.filter(m => m.status === "LIVE").length;
-    const results = allMatches.filter(m => m.status === "RESULT").length;
+    const filterStatus = document.getElementById("filter-status").value;
+    const pool = filterStatus === "all"
+        ? allMatches
+        : allMatches.filter(m => m.status === filterStatus);
+
+    const total = pool.length;
+    const live = pool.filter(m => m.status === "LIVE").length;
+    const results = pool.filter(m => m.status === "RESULT").length;
     const countries = new Set();
-    allMatches.forEach(m => {
+    pool.forEach(m => {
         if (m.player1.country) countries.add(m.player1.country);
         if (m.player2.country) countries.add(m.player2.country);
     });
-    const threeSetters = allMatches.filter(m =>
+    const threeSetters = pool.filter(m =>
         Math.max(m.sets.player1.length, m.sets.player2.length) >= 3
     ).length;
-    const hottest = allMatches.length > 0
-        ? allMatches.reduce((max, m) => m.intensity > max.intensity ? m : max, allMatches[0])
+    const hottest = pool.length > 0
+        ? pool.reduce((max, m) => m.intensity > max.intensity ? m : max, pool[0])
         : null;
 
     document.querySelector("#stat-total .stat-num").textContent = total;
@@ -121,6 +128,8 @@ function updateSummary() {
     if (hottest) {
         const name = hottest.player1.name.split(" ").pop() + " v " + hottest.player2.name.split(" ").pop();
         document.querySelector("#stat-hottest .stat-num").textContent = name;
+    } else {
+        document.querySelector("#stat-hottest .stat-num").textContent = "-";
     }
 }
 
@@ -381,9 +390,13 @@ function buildSetsHtml(m) {
 
 // ── EVENT LISTENERS ───────────────────────────────────────────────
 // Re-render whenever a dropdown changes (no full re-fetch needed).
-document.getElementById("group-by").addEventListener("change", renderMatches);
-document.getElementById("filter-status").addEventListener("change", renderMatches);
-document.getElementById("sort-by").addEventListener("change", renderMatches);
+// Re-render match list and update summary cards on any dropdown change.
+// The filter-status listener calls updateSummary() so all five stat
+// cards reflect the active filter (All / LIVE / RESULT).
+function onControlChange() { updateSummary(); renderMatches(); }
+document.getElementById("group-by").addEventListener("change", onControlChange);
+document.getElementById("filter-status").addEventListener("change", onControlChange);
+document.getElementById("sort-by").addEventListener("change", onControlChange);
 
 // ── BOOT ──────────────────────────────────────────────────────────
 fetchScores();
